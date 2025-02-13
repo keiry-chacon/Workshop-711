@@ -1,0 +1,124 @@
+/* General */
+body {
+    background-color: #f3f4f6; /* Fondo claro */
+    font-family: 'Arial', sans-serif;
+  }
+  
+  /* Contenedor Principal */
+  .form-container {
+    background-color: #fff;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+    border-radius: 10px;
+    padding: 20px; /* Reducción del padding */
+    width: 100%;
+    max-width: 600px; /* Menor ancho del formulario */
+    margin: 0 auto;
+  }
+  
+  /* Título del Formulario */
+  h2 {
+    font-size: 2rem; /* Título más pequeño */
+    color: #4A4A4A;
+    text-align: center;
+    margin-bottom: 30px; /* Menor margen */
+    font-weight: 700;
+  }
+  
+  /* Etiquetas */
+  .label {
+    display: block;
+    font-size: 0.9rem; /* Etiquetas más pequeñas */
+    font-weight: 600;
+    color: #4A4A4A;
+    margin-bottom: 6px; /* Menor espacio entre label y campo */
+  }
+  
+  /* Campos de Entrada */
+  .input-field {
+    width: 100%;
+    padding: 10px; /* Menor padding */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 0.9rem; /* Menor tamaño de fuente */
+    color: #333;
+    transition: border 0.3s ease;
+  }
+  
+  .input-field:focus {
+    outline: none;
+    border-color: #4C6EF5;
+  }
+  
+  /* Botones de Acción */
+  .button {
+    width: 100%;
+    padding: 10px; /* Menor padding en botones */
+    font-size: 0.9rem; /* Menor tamaño de fuente en botones */
+    font-weight: bold;
+    border-radius: 5px;
+    margin-top: 10px; /* Menor espacio entre botones */
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .button:hover {
+    opacity: 0.8;
+  }
+  
+  .button:focus {
+    outline: none;
+  }
+  
+  .bg-blue-600 {
+    background-color: #4C6EF5;
+    color: #fff;
+  }
+  
+  .bg-yellow-500 {
+    background-color: #FFCC00;
+    color: #fff;
+  }
+  
+  .bg-red-600 {
+    background-color: #FF4C4C;
+    color: #fff;
+  }
+  
+  .bg-green-600 {
+    background-color: #4CAF50;
+    color: #fff;
+  }
+  
+  /* Espaciado entre elementos */
+  .mb-6 {
+    margin-bottom: 1rem; /* Menor margen entre los campos */
+  }
+  
+  .mt-10 {
+    margin-top: 2rem;
+  }
+  
+  .space-y-6 > * + * {
+    margin-top: 1rem; /* Menor espacio entre los elementos de la lista */
+  }
+  
+  /* Lista de Profesores */
+  #result {
+    list-style: none;
+    padding: 0;
+  }
+  
+  #result li {
+    background-color: #f9fafb;
+    padding: 10px; /* Menor padding */
+    border-radius: 5px;
+    border: 1px solid #ddd;
+  }
+  
+  #result li:hover {
+    background-color: #e2e8f0;
+  }
+  
+  
+  
+  
