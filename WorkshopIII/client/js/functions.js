@@ -1,10 +1,9 @@
 const API_URL = "http://localhost:3001/api/teachers";
-
-
+const API_URLC = "http://localhost:3001/api/courses";
 
 async function deleteTeacher() {
     const deleteButton = document.getElementById("delete-button");
-    const teacherId = deleteButton.getAttribute("data-id");  // Obtener el _id desde el atributo data-id
+    const teacherId = deleteButton.getAttribute("data-id");  
 
     if (!teacherId) {
         alert("No se ha seleccionado ningún profesor para eliminar.");
@@ -16,7 +15,7 @@ async function deleteTeacher() {
     }
 
     try {
-        const response = await fetch(`${API_URL}/${teacherId}`, {  // Usamos _id en la URL
+        const response = await fetch(`${API_URL}/${teacherId}`, {  
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json"
@@ -64,7 +63,7 @@ async function editTeacher() {
     };
 
     try {
-        const response = await fetch(`${API_URL}/${teacherId}`, {  // Usamos PUT para actualizar el profesor
+        const response = await fetch(`${API_URL}/${teacherId}`, {  
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
@@ -82,7 +81,6 @@ async function editTeacher() {
         document.getElementById("last_name").value = '';
         document.getElementById("cedula").value = '';
         document.getElementById("age").value = '';
-        // Recargar la lista de profesores después de la actualización
         getTeachers(); 
     } catch (error) {
         console.error("Error:", error);
@@ -95,7 +93,7 @@ async function getTeachers() {
         const response = await fetch(API_URL); 
         const teachers = await response.json();
         const resultList = document.getElementById("result");
-        resultList.innerHTML = ""; // Limpiar la lista antes de agregar nuevos elementos
+        resultList.innerHTML = ""; 
 
         teachers.forEach(teacher => {
             const li = document.createElement("li");
@@ -116,12 +114,12 @@ async function getTeachers() {
 
 function fillForm(teacher) {
     document.getElementById("first_name").value = teacher.first_name;
-    document.getElementById("last_name").value = teacher.last_name;
-    document.getElementById("cedula").value = teacher.cedula;
-    document.getElementById("age").value = teacher.age;
-    const deleteButton = document.getElementById("delete-button");
+    document.getElementById("last_name").value  = teacher.last_name;
+    document.getElementById("cedula").value     = teacher.cedula;
+    document.getElementById("age").value        = teacher.age;
+    const deleteButton                          = document.getElementById("delete-button");
     deleteButton.setAttribute("data-id", teacher._id); 
-    const editButton = document.getElementById("edit-button");
+    const editButton                            = document.getElementById("edit-button");
     editButton.setAttribute("data-id", teacher._id); 
 
 }
@@ -147,7 +145,7 @@ async function createTeacher() {
             const newTeacher = await response.json();
             console.log('Teacher saved', newTeacher);
             alert('Teacher saved');
-            getTeachers(); // Refresh the teacher list
+            getTeachers(); 
         } else {
             alert("An error occurred while saving the teacher.");
         }
@@ -156,4 +154,210 @@ async function createTeacher() {
         alert("An error occurred while saving the teacher.");
     }
 }
+async function getAllTeachers() {
+    try {
+        const response = await fetch(API_URL);
+        const teachers = await response.json();
+
+        const selectProfesores     = document.getElementById("profesor");
+        selectProfesores.innerHTML = '<option value="">Seleccione un profesor</option>';
+
+        teachers.forEach(teacher => {
+            const option       = document.createElement("option");
+            option.setAttribute("data-id", teacher._id); 
+             option.textContent = `${teacher.first_name} ${teacher.last_name}`;
+            selectProfesores.appendChild(option);
+        });
+    } catch (error) {
+        console.error("Error fetching teachers:", error);
+    }
+}
+document.addEventListener("DOMContentLoaded", getAllTeachers);
+
+//Courses
+
+async function createCourse() {
+    const selectProfesor = document.getElementById('profesor');
+    const teacherId      = selectProfesor.options[selectProfesor.selectedIndex].getAttribute('data-id'); 
+   
+    if (!teacherId) {
+        alert('Por favor, seleccione un profesor.');
+        return;
+    }
+
+    const course = {
+        name: document.getElementById('name').value,
+        credits: document.getElementById('creditos').value,
+        teacher_id: teacherId, 
+    };
+
+    try {
+        const response = await fetch(API_URLC, { 
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(course) 
+        });
+
+        if (response.status === 201) {
+            const newCourse = await response.json();
+            console.log('Course saved:', newCourse);
+            alert('Curso guardado con éxito');
+            document.getElementById("name").value = '';
+            document.getElementById("creditos").value = '';
+            document.getElementById("profesor").value = '';
+        } else {
+            alert("Ocurrió un error al guardar el curso.");
+        }
+    } catch (error) {
+        console.error('Error al guardar el curso:', error);
+        alert("Ocurrió un error al guardar el curso.");
+    }
+}
+
+async function getCourses() {
+    try {
+        const response       = await fetch(API_URLC); 
+        const courses        = await response.json();
+        const resultList     = document.getElementById("result");
+        resultList.innerHTML = "";
+
+        for (const course of courses) {
+            const teacherName = `${course.teacher.first_name} ${course.teacher.last_name}`;
+      
+            const li = document.createElement("li");
+            li.textContent = `${course.name} - ${teacherName}`;  
+            li.setAttribute("data-id", course._id.$oid); 
+            li.setAttribute("data-name", course.name);
+            li.setAttribute("data-credits", course.credits);
+            li.setAttribute("data-teacher", course.teacher._id.$oid);  
+            li.style.cursor = "pointer";
+      
+
+            li.addEventListener("click", () => {
+                console.log('Curso clickeado:', course.name);  
+                fillForm(course);  
+            });
+
+            resultList.appendChild(li);
+        }
+    } catch (error) {
+        console.error("Error fetching courses:", error);
+    }
+}
+
+async function fillForm(course) {
+    document.getElementById("name").value = course.name;
+    document.getElementById("creditos").value = course.credits;
+    
+    const selectProfesores = document.getElementById("profesor");
+    const teacherId        = String(course.teacher._id); 
+
+    const options = selectProfesores.getElementsByTagName("option");
+    for (let option of options) {
+        if (option.getAttribute("data-id") === teacherId) {
+            option.selected = true;
+            break;
+        }
+    }
+
+    const editButton = document.getElementById("edit-button");
+    editButton.setAttribute("data-id", course._id); 
+    editButton.setAttribute("data-id-teacher", course.teacher._id); 
+
+    const deleteButton = document.getElementById("delete-button");
+    deleteButton.setAttribute("data-id", course._id); 
+}
+
+async function editCourse() {
+    const courseId       = document.getElementById("edit-button").getAttribute("data-id");
+    const selectProfesor = document.getElementById('profesor');
+    const teacherId      = selectProfesor.options[selectProfesor.selectedIndex].getAttribute('data-id'); 
+   
+    
+    if (!courseId) {
+        alert("No se ha seleccionado ningún curso para editar.");
+        return;
+    }
+
+    const name    = document.getElementById("name").value;
+    const credits = document.getElementById("creditos").value;
+
+    if (!name || !credits || !teacherId) {
+        alert("Por favor complete todos los campos.");
+        return;
+    }
+
+    const updatedCourse = {
+        name: name,
+        credits: credits,
+        teacher: teacherId 
+    };
+
+    try {
+        const response = await fetch(`${API_URLC}/${courseId}`, {  
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(updatedCourse)
+        });
+
+        if (!response.ok) {
+            throw new Error("Error al editar el curso.");
+        }
+
+        const result = await response.json();
+        alert(result.message);  
+
+        document.getElementById("name").value = '';
+        document.getElementById("creditos").value = '';
+        document.getElementById("profesor").value = '';
+
+        getCourses(); 
+    } catch (error) {
+        console.error("Error:", error);
+        alert("Hubo un error al actualizar el curso.");
+    }
+}
+
+async function deleteCourse() {
+    const deleteButton = document.getElementById("delete-button");
+    const courseId     = deleteButton.getAttribute("data-id");  
+
+    if (!courseId) {
+        alert("No se ha seleccionado ningún profesor para eliminar.");
+        return;
+    }
+
+    if (!confirm("¿Estás seguro de que deseas eliminar este curso?")) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_URLC}/${courseId}`, {  
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error("Error al eliminar el profesor.");
+        }
+
+        alert("Profesor eliminado correctamente.");
+        document.getElementById("name").value   = '';
+        document.getElementById("credits").value = '';
+        getCourses();
+    } catch (error) {
+        console.error("Error:", error);
+        alert("Hubo un error al eliminar el profesor.");
+    }
+}
+
+
+
+
 

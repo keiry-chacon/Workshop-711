@@ -1,4 +1,6 @@
+const mongoose = require('mongoose'); 
 const Course = require("../models/courseModel");
+const Teacher = require("../models/teacherModel");
 
 /**
  * Creates a course
@@ -7,23 +9,47 @@ const Course = require("../models/courseModel");
  * @param {*} res
  */
 const coursePost = async (req, res) => {
-  let course = new Course(req.body);
-  await course.save()
-    .then(course => {
-      res.status(201); // CREATED
-      res.header({
-        'location': `/api/courses/?id=${course.id}`
-      });
-      res.json(course);
-    })
-    .catch( err => {
-      res.status(422);
-      console.log('error while saving the course', err);
-      res.json({
-        error: 'There was an error saving the course'
-      });
+  const { teacher_id, name, credits } = req.body; 
+  if (!teacher_id) {
+    return res.status(422).json({
+      error: 'Teacher ID is required to assign a teacher to the course'
     });
+  }
+  if (!mongoose.Types.ObjectId.isValid(teacher_id)) {
+    return res.status(422).json({
+      error: 'Invalid Teacher ID'
+    });
+  }
+
+  try {
+    const teacher = await Teacher.findById(teacher_id);  
+
+    if (!teacher) {
+      return res.status(404).json({
+        error: 'Teacher not found'
+      });
+    }
+
+    let course = new Course({
+      name,
+      credits,
+      teacher: teacher._id  
+    });
+
+    await course.save();
+    res.status(201).header({
+      'location': `/api/courses/?id=${course.id}`  
+    }).json(course);
+  } catch (err) {
+    res.status(422).json({
+      error: 'There was an error saving the course',
+      details: err
+    });
+    console.log('Error while saving the course', err);
+  }
 };
+
+
 
 /**
  * Get all courses or one
@@ -32,31 +58,93 @@ const coursePost = async (req, res) => {
  * @param {*} res
  */
 const courseGet = (req, res) => {
-  // if an specific teacher is required
   if (req.query && req.query.id) {
-    Course.findById(req.query.id).populate('teacher')
-      .then( (course) => {
+    Course.findById(req.query.id).populate('teacher') 
+      .then((course) => {
+        if (!course) {
+          return res.status(404).json({ error: "El curso no existe" });
+        }
         res.json(course);
       })
       .catch(err => {
-        res.status(404);
-        console.log('error while queryting the course', err)
-        res.json({ error: "Course doesnt exist" })
+        console.log('Error al buscar el curso:', err);
+        res.status(500).json({ error: "Error al buscar el curso" });
       });
   } else {
-    // get all teachers
-    Course.find().populate('teacher')
-      .then( courses => {
+    Course.find().populate('teacher') 
+      .then(courses => {
         res.json(courses);
       })
       .catch(err => {
-        res.status(422);
-        res.json({ "error": err });
+        console.log('Error al obtener cursos:', err);
+        res.status(500).json({ error: "Error al obtener los cursos" });
       });
+  }
+};
+
+/**
+ * Edit teacher by _id
+ *
+ * @param {*} req
+ * @param {*} res
+ */
+const coursePut = async (req, res) => {
+  const { id } = req.params; 
+  const { name, credits, teacher } = req.body; // Asegurar que los datos del curso sean los correctos
+
+  if (!name || !credits || !teacher) {
+      return res.status(400).json({ error: "Todos los campos son requeridos." });
+  }
+
+  try {
+      const course = await Course.findById(id);
+      
+      if (!course) {
+          return res.status(404).json({ error: "Curso no encontrado." });
+      }
+
+      // Actualizar los datos del curso
+      course.name = name;
+      course.credits = credits;
+      course.teacher = teacher; // Guardar el ID del profesor
+
+      await course.save();  
+
+      return res.json({ message: "Curso actualizado correctamente", course });
+  } catch (error) {
+      console.error('Error while updating the course:', error);
+      return res.status(500).json({ error: "Hubo un error al actualizar el curso." });
+  }
+};
+/**
+ * Delete Teacher
+ * 
+ * @param {*} req
+ * @param {*} res
+ */
+const courseDelete = async (req, res) => {
+  try {
+      const { id } = req.params;  
+
+      if (!id) {
+          return res.status(400).json({ error: "Debe proporcionar un ID válido." });
+      }
+      const deletedCourse = await Course.findByIdAndDelete(id);
+
+      if (!deletedCourse) {
+          return res.status(404).json({ error: "Profesor no encontrado." });
+      }
+
+      res.json({ message: "Curso eliminado correctamente." });
+  } catch (error) {
+      console.error("Error al eliminar el curso:", error);
+      res.status(500).json({ error: "Hubo un error al eliminar el profesor." });
   }
 };
 
 module.exports = {
   coursePost,
-  courseGet
+  courseGet,
+  coursePut,
+  courseDelete
 }

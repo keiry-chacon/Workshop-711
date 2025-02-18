@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:3001/api/teachers"; // Verifica que esta sea la URL correcta
+const API_URL = "http://localhost:3001/api/teachers"; 
 
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;

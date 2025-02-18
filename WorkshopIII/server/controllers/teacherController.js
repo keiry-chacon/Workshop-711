@@ -1,4 +1,6 @@
 const Teacher = require("../models/teacherModel");
+const mongoose = require('mongoose');
+
 /**
  * Creates a teacher
  *
@@ -16,7 +18,7 @@ const teacherPost = (req, res) => {
   if (teacher.first_name && teacher.last_name) {
     teacher.save()
       .then(() => {
-        res.status(201); // CREATED
+        res.status(201);
         res.header({
           'location': `/api/teachers/?id=${teacher.id}`
         });
@@ -44,8 +46,7 @@ const teacherPost = (req, res) => {
  * @param {*} req
  * @param {*} res
  */
-const teacherGet = (req, res) => {
-  // Si se requiere un profesor específico
+const teacherGetAll = (req, res) => {
   if (req.query && req.query.id) {
     Teacher.findById(req.query.id)
       .then(teacher => {
@@ -61,7 +62,6 @@ const teacherGet = (req, res) => {
         return res.json({ error: "An error occurred while fetching the teacher" });
       });
   } else {
-    // Obtener todos los profesores
     Teacher.find()
       .then(teachers => {
         return res.json(teachers);
@@ -74,20 +74,45 @@ const teacherGet = (req, res) => {
   }
 };
 /**
- * Función para eliminar un docente por _id
+ * Get all teachers
+ *
+ * @param {*} req
+ * @param {*} res
+ */
+const teacherGet = async (req, res) => {
+  const teacherId = req.params.id;
+  if (teacherId && typeof teacherId === 'string' && mongoose.Types.ObjectId.isValid(teacherId)) {
+    try {
+      const teacher = await Teacher.findById(teacherId);
+      if (teacher) {
+        return res.json(teacher);
+      }
+      return res.status(404).json({ error: "Teacher doesn't exist" });
+    } catch (err) {
+      console.error('Error while fetching teacher:', err);
+      return res.status(500).json({ error: "An error occurred while fetching the teacher" });
+    }
+  } else {
+    return res.status(400).json({ error: "Invalid teacher ID" });
+  }
+};
+
+
+
+
+/**
+ * Delete Teacher
  * 
  * @param {*} req
  * @param {*} res
  */
 const teacherDelete = async (req, res) => {
   try {
-      const { id } = req.params;  // Aquí recibimos el _id, no la cédula
+      const { id } = req.params;  
 
       if (!id) {
           return res.status(400).json({ error: "Debe proporcionar un ID válido." });
       }
-
-      // Buscar y eliminar el profesor usando el _id
       const deletedTeacher = await Teacher.findByIdAndDelete(id);
 
       if (!deletedTeacher) {
@@ -108,7 +133,7 @@ const teacherDelete = async (req, res) => {
  * @param {*} res
  */
 const teacherPut = async (req, res) => {
-    const { id } = req.params;  // Recibimos el _id del docente desde la URL
+    const { id } = req.params; 
     const { first_name, last_name, age, cedula } = req.body;
 
     if (!first_name || !last_name || !age || !cedula) {
@@ -127,7 +152,7 @@ const teacherPut = async (req, res) => {
         teacher.age = age;
         teacher.cedula = cedula;
 
-        await teacher.save();  // Guardamos los cambios en el documento
+        await teacher.save();  
 
         return res.json({ message: "Profesor actualizado correctamente", teacher });
     } catch (error) {
@@ -136,11 +161,10 @@ const teacherPut = async (req, res) => {
     }
 };
 
-
-
 module.exports = {
   teacherGet,
   teacherPost,
   teacherDelete,
-  teacherPut
+  teacherPut,
+  teacherGetAll
 }
