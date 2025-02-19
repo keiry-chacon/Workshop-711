@@ -9,7 +9,7 @@ const Teacher = require("../models/teacherModel");
  * @param {*} res
  */
 const coursePost = async (req, res) => {
-  const { teacher_id, name, credits } = req.body; 
+  const { teacher_id, name, code, description } = req.body; 
   if (!teacher_id) {
     return res.status(422).json({
       error: 'Teacher ID is required to assign a teacher to the course'
@@ -32,7 +32,8 @@ const coursePost = async (req, res) => {
 
     let course = new Course({
       name,
-      credits,
+      code,
+      description,
       teacher: teacher._id  
     });
 
@@ -90,9 +91,9 @@ const courseGet = (req, res) => {
  */
 const coursePut = async (req, res) => {
   const { id } = req.params; 
-  const { name, credits, teacher } = req.body; // Asegurar que los datos del curso sean los correctos
+  const { name, code, description, teacher } = req.body; 
 
-  if (!name || !credits || !teacher) {
+  if (!name || !code || !description|| !teacher) {
       return res.status(400).json({ error: "Todos los campos son requeridos." });
   }
 
@@ -103,10 +104,10 @@ const coursePut = async (req, res) => {
           return res.status(404).json({ error: "Curso no encontrado." });
       }
 
-      // Actualizar los datos del curso
       course.name = name;
-      course.credits = credits;
-      course.teacher = teacher; // Guardar el ID del profesor
+      course.code = code;
+      course.description = description;
+      course.teacher = teacher; 
 
       await course.save();  
 

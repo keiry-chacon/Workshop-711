@@ -7,10 +7,14 @@ const courseSchema = new mongoose.Schema({
     required: true, 
     unique: true, 
   },
-  credits: { 
-    type: Number, 
+  code: {  
+    type: String,  
     required: true, 
-    min: [1, 'Credits must be at least 1'],
+    unique: true, 
+  },
+  description: {  
+    type: String, 
+    required: false,  
   },
   teacher: { 
     type: mongoose.Schema.Types.ObjectId, 

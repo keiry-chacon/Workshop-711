@@ -187,7 +187,8 @@ async function createCourse() {
 
     const course = {
         name: document.getElementById('name').value,
-        credits: document.getElementById('creditos').value,
+        code: document.getElementById('code').value,
+        description: document.getElementById('description').value,
         teacher_id: teacherId, 
     };
 
@@ -205,7 +206,8 @@ async function createCourse() {
             console.log('Course saved:', newCourse);
             alert('Curso guardado con éxito');
             document.getElementById("name").value = '';
-            document.getElementById("creditos").value = '';
+            document.getElementById("code").value = '';
+            document.getElementById("description").value = '';
             document.getElementById("profesor").value = '';
         } else {
             alert("Ocurrió un error al guardar el curso.");
@@ -249,8 +251,9 @@ async function getCourses() {
 
 async function fillForm(course) {
     document.getElementById("name").value = course.name;
-    document.getElementById("creditos").value = course.credits;
-    
+    document.getElementById("code").value = course.code;
+    document.getElementById("description").value = course.description;
+
     const selectProfesores = document.getElementById("profesor");
     const teacherId        = String(course.teacher._id); 
 
@@ -281,17 +284,19 @@ async function editCourse() {
         return;
     }
 
-    const name    = document.getElementById("name").value;
-    const credits = document.getElementById("creditos").value;
+    const name        = document.getElementById("name").value;
+    const code        = document.getElementById("code").value;
+    const description = document.getElementById("description").value;
 
-    if (!name || !credits || !teacherId) {
+    if (!name || !code || !description || !teacherId) {
         alert("Por favor complete todos los campos.");
         return;
     }
 
     const updatedCourse = {
         name: name,
-        credits: credits,
+        code: code,
+        description: description,
         teacher: teacherId 
     };
 
@@ -312,7 +317,8 @@ async function editCourse() {
         alert(result.message);  
 
         document.getElementById("name").value = '';
-        document.getElementById("creditos").value = '';
+        document.getElementById("code").value = '';
+        document.getElementById("description").value = '';
         document.getElementById("profesor").value = '';
 
         getCourses(); 
@@ -342,14 +348,11 @@ async function deleteCourse() {
                 "Content-Type": "application/json"
             }
         });
-
-        if (!response.ok) {
-            throw new Error("Error al eliminar el profesor.");
-        }
-
         alert("Profesor eliminado correctamente.");
-        document.getElementById("name").value   = '';
-        document.getElementById("credits").value = '';
+        document.getElementById("name").value = '';
+        document.getElementById("code").value = '';
+        document.getElementById("description").value = '';
+        document.getElementById("profesor").value = '';
         getCourses();
     } catch (error) {
         console.error("Error:", error);
