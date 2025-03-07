@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="js/login.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="font-sans">
+    <div class="flex justify-center items-center min-h-screen bg-gradient-to-r from-blue-50 to-purple-50 bg-opacity-60 p-4">
+        <div class="form-container">
+        <h2 class="text-4xl font-bold text-center text-gray-800 mb-8">Login</h2>
+        <form action="" method="post">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="mb-6">
+                <label for="user" class="label">User</label>
+                <input type="text" id="user" name="user" class="input-field" placeholder="Username" required>
+            </div>
+            <div class="mb-6">
+                <label for="password" class="label">Password</label>
+                <input type="text" id="password" name="password" class="input-field" placeholder="Password" required>
+            </div>
+            <div class="button-container">
+                <button type="button" class="button bg-blue-600 text-white" onclick="Login(); return false;">Ingresar</button>
+            </div>
+            <button type="button" class="button bg-blue-600 text-white" onclick="window.location.href='courses.html'">Crear Curso</button>
+        </div>
+    </div>
+</body>
+</html>

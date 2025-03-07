@@ -2,8 +2,15 @@ const API_URL = "http://localhost:3001/api/teachers";
 const API_URLC = "http://localhost:3001/api/courses";
 
 async function deleteTeacher() {
+    const decoUserPassword = localStorage.getItem('user');
+    if (!decoUserPassword) {
+        alert('No se encontró información de usuario en el almacenamiento local.');
+        return;
+    }
+        
+
     const deleteButton = document.getElementById("delete-button");
-    const teacherId = deleteButton.getAttribute("data-id");  
+    const teacherId    = deleteButton.getAttribute("data-id");  
 
     if (!teacherId) {
         alert("No se ha seleccionado ningún profesor para eliminar.");
@@ -18,7 +25,8 @@ async function deleteTeacher() {
         const response = await fetch(`${API_URL}/${teacherId}`, {  
             method: "DELETE",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "authorization": `Basic ${decoUserPassword}`  
             }
         });
 
@@ -38,6 +46,11 @@ async function deleteTeacher() {
     }
 }
 async function editTeacher() {
+    const decoUserPassword = localStorage.getItem('user');
+    if (!decoUserPassword) {
+        alert('No se encontró información de usuario en el almacenamiento local.');
+        return;
+    }
     const teacherId = document.getElementById("edit-button").getAttribute("data-id"); // Obtener el ID del profesor desde el botón de editar
 
     if (!teacherId) {
@@ -46,9 +59,9 @@ async function editTeacher() {
     }
 
     const firstName = document.getElementById("first_name").value;
-    const lastName = document.getElementById("last_name").value;
-    const cedula = document.getElementById("cedula").value;
-    const age = document.getElementById("age").value;
+    const lastName  = document.getElementById("last_name").value;
+    const cedula    = document.getElementById("cedula").value;
+    const age       = document.getElementById("age").value;
 
     if (!firstName || !lastName || !cedula || !age) {
         alert("Por favor complete todos los campos.");
@@ -66,7 +79,9 @@ async function editTeacher() {
         const response = await fetch(`${API_URL}/${teacherId}`, {  
             method: "PUT",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "authorization": `Basic ${decoUserPassword}`  
+
             },
             body: JSON.stringify(updatedTeacher)
         });
@@ -89,8 +104,17 @@ async function editTeacher() {
 }
 
 async function getTeachers() {
+    const decoUserPassword = localStorage.getItem('user');
+    if (!decoUserPassword) {
+        alert('No se encontró información de usuario en el almacenamiento local.');
+        return;
+    }
     try {
-        const response = await fetch(API_URL); 
+        const response = await fetch(API_URL,{  
+            headers: {
+                "authorization": `Basic ${decoUserPassword}`  
+            },
+        }); 
         const teachers = await response.json();
         const resultList = document.getElementById("result");
         resultList.innerHTML = ""; 
@@ -125,6 +149,11 @@ function fillForm(teacher) {
 }
 
 async function createTeacher() {
+    const decoUserPassword = localStorage.getItem('user');
+    if (!decoUserPassword) {
+        alert('No se encontró información de usuario en el almacenamiento local.');
+        return;
+    }
     const teacher = {
         first_name: document.getElementById('first_name').value,
         last_name: document.getElementById('last_name').value,
@@ -155,9 +184,18 @@ async function createTeacher() {
     }
 }
 async function getAllTeachers() {
+    const decoUserPassword = localStorage.getItem('user');
+    if (!decoUserPassword) {
+        alert('No se encontró información de usuario en el almacenamiento local.');
+        return;
+    }
     try {
-        const response = await fetch(API_URL);
-        const teachers = await response.json();
+        const response = await fetch(API_URL, {  
+            headers: {
+                "Authorization": `Basic ${decoUserPassword}`  
+            }
+        });
+                const teachers = await response.json();
 
         const selectProfesores     = document.getElementById("profesor");
         selectProfesores.innerHTML = '<option value="">Seleccione un profesor</option>';
@@ -177,6 +215,11 @@ document.addEventListener("DOMContentLoaded", getAllTeachers);
 //Courses
 
 async function createCourse() {
+    const decoUserPassword = localStorage.getItem('user');
+    if (!decoUserPassword) {
+        alert('No se encontró información de usuario en el almacenamiento local.');
+        return;
+    }
     const selectProfesor = document.getElementById('profesor');
     const teacherId      = selectProfesor.options[selectProfesor.selectedIndex].getAttribute('data-id'); 
    
@@ -219,8 +262,17 @@ async function createCourse() {
 }
 
 async function getCourses() {
+    const decoUserPassword = localStorage.getItem('user');
+    if (!decoUserPassword) {
+        alert('No se encontró información de usuario en el almacenamiento local.');
+        return;
+    }
     try {
-        const response       = await fetch(API_URLC); 
+        const response       = await fetch(API_URLC,{  
+            headers: {
+                "authorization": `Basic ${decoUserPassword}`  
+            },
+        });  
         const courses        = await response.json();
         const resultList     = document.getElementById("result");
         resultList.innerHTML = "";
@@ -359,6 +411,7 @@ async function deleteCourse() {
         alert("Hubo un error al eliminar el profesor.");
     }
 }
+
 
 
 

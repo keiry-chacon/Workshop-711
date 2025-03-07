@@ -24,6 +24,25 @@ app.use(cors({
   methods: "*"
 }));
 
+// Auth basic http
+app.use(function (req, res, next) {
+  if (req.headers["authorization"]) {
+    const authBase64 = req.headers['authorization'].split(' ');
+    const userPass   = atob(authBase64[1]);
+    const user       = userPass.split(':')[0];
+    const password   = userPass.split(':')[1];
+
+    if (user === 'admin' && password == '1234') {
+      return next(); 
+    }
+  }
+  res.status(401);
+  res.send({
+    error: "Unauthorized"
+  });
+});
+
+
 const { teacherGet, teacherGetAll, teacherPost, teacherPut, teacherDelete } = require('./controllers/teacherController');
 
 const { coursePost, courseGet, coursePut, courseDelete } = require('./controllers/courseController');
